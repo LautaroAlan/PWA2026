@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trabajo Práctico #1 - Vue.js</title>
-    <!-- Librería Axios declarada vía CDN -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
@@ -13,28 +12,45 @@
         <h1>Trabajo Práctico 1</h1>
         <hr>
 
+        Paso #2
         <h2>Paso #2: Información de Perfil Simple</h2>
         <p>Nombre: {{ nombre }}</p>
         <p>Edad: {{ edad }}</p>
         <p>Ciudad: {{ ciudad }}</p>
         <p>Hola, mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{ ciudad }}.</p>
-        
+        <hr>
+
+        <h2>Paso #3: Contador Interactivo</h2>
+        <!-- Muestra el valor actual del contador -->
+        <p>Contador: {{ contador }}</p>
+        <!-- Botones con que llaman a los métodos -->
+        <button @click="incrementar">Incrementar</button>
+        <button @click="decrementar">Decrementar</button>
         <hr>
     </div>
-
+            <!-- Librería Vue.js (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
 
     <script>
         new Vue({
             el: '#app',
             data: {
-                // Variables requeridas en la consigna
                 nombre: "Ana García",
                 edad: 30,
-                ciudad: "Tupungato"
+                ciudad: "Tupungato",
+                
+                contador: 0
             },
-            computed: {},
-            methods: {}
+            computed: {
+            },
+            methods: {
+                incrementar() {
+                    this.contador++; //suma 1
+                },
+                decrementar() {
+                    this.contador--; //resta 1
+                }
+            }
         });
     </script>
 </body>
