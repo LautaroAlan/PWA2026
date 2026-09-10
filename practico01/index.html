@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trabajo Práctico #1 - Vue.js</title>
-    <!-- Paso #6: Librería Axios CDN ya incluida -->
+    <!-- Paso #6: Librería Axios CDN -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
@@ -52,31 +52,72 @@
             </li>
         </ul>
         <hr>
+
+        <!-- Paso #7: Mostrar Posts y Comentarios -->
+        <h2>Paso #7: Posts y Comentarios</h2>
+        <div style="display: flex; gap: 20px;">
+            <!-- Columna Izquierda: Posts -->
+            <div style="flex: 1;">
+                <h3>Publicaciones</h3>
+                <ul>
+                    <li v-for="post in posts" :key="post.id" @click="cargarComentarios(post.id)" style="cursor: pointer; color: blue; text-decoration: underline; margin-bottom: 8px;">
+                        <strong>{{ post.title }}</strong>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Columna Derecha: Comentarios -->
+            <div style="flex: 1;">
+                <h3>Comentarios del Post Clickeado</h3>
+                <p v-if="comentarios.length === 0">Haz clic en un post de la izquierda para cargar sus comentarios.</p>
+                <ul v-else>
+                    <li v-for="comment in comentarios" :key="comment.id" style="margin-bottom: 10px;">
+                        <strong>{{ comment.email }}:</strong> {{ comment.body }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <hr>
     </div>
     
+    <!-- Librería Vue.js (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
 
     <script>
-        new Vue({
+        const app = new Vue({
             el: '#app',
             data: {
+                // Variables Paso 2
                 nombre: "Ana García",
                 edad: 30,
                 ciudad: "Tupungato",
+                
+                // Variables Paso 3
                 contador: 0,
+
+                // Variables Paso 4
                 nuevaTarea: '',
                 tareas: [
                     { id: 1, texto: 'Aprender Vue', completada: false }
                 ],
-                listaeventos: []
+
+                // Variables Paso 5
+                listaeventos: [],
+
+                // Variables Paso 7
+                posts: [],
+                comentarios: []
             },
             computed: {
                 totalTareas() { return this.tareas.length; },
                 tareasPendientes() { return this.tareas.filter(tarea => tarea.completada === false).length; }
             },
             methods: {
+                // Metodos Paso 3
                 incrementar() { this.contador++; },
                 decrementar() { this.contador--; },
+
+                // Metodos Paso 4
                 agregarTarea() {
                     if (this.nuevaTarea.trim() === '') return;
                     let nuevoId = this.tareas.length > 0 ? Math.max(...this.tareas.map(t => t.id)) + 1 : 1;
@@ -84,7 +125,7 @@
                     this.nuevaTarea = '';
                 },
 
-                // --- Métodos Paso #6: Implementación de Axios ---
+                // Metodos Paso 6: Implementación de Axios
                 async obtenerPost(postId) {
                     try {
                         const respuesta = await axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`);
@@ -100,18 +141,52 @@
                     } catch (error) {
                         console.error("Error al obtener los comentarios:", error);
                     }
+                },
+
+                // Metodo Paso 7: Invoca obtenerComments y asigna los datos
+                async cargarComentarios(postId) {
+                    const datosComentarios = await this.obtenerComments(postId);
+                    if (datosComentarios) {
+                        this.comentarios = datosComentarios;
+                    }
                 }
             },
 
-            // --- HOOKS DEL CICLO DE VIDA (Paso #5 Literal) ---
-            beforeCreate() { console.log("beforeCreate disparado"); },
-            created() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'created', timestamp: Date.now() }); },
-            beforeMount() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeMount', timestamp: Date.now() }); },
-            mounted() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'mounted', timestamp: Date.now() }); },
-            beforeUpdate() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeUpdate', timestamp: Date.now() }); },
-            updated() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'updated', timestamp: Date.now() }); },
-            beforeDestroy() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeDestroy', timestamp: Date.now() }); },
-            destroyed() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'destroyed', timestamp: Date.now() }); }
+            // --- HOOKS DEL CICLO DE VIDA ---
+            beforeCreate() {
+                console.log("beforeCreate disparado");
+            },
+            created() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'created', timestamp: Date.now() });
+            },
+            beforeMount() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeMount', timestamp: Date.now() });
+            },
+            async mounted() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'mounted', timestamp: Date.now() });
+
+                // Paso 7: Bucle de 10 ejecuciones para cargar los posts al iniciar la app
+                for (let i = 1; i <= 10; i++) {
+                    const unPost = await this.obtenerPost(i);
+                    if (unPost) {
+                        this.posts.push(unPost);
+                    }
+                }
+            },
+            /* Comentados por bucle de actualización
+            beforeUpdate() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeUpdate', timestamp: Date.now() });
+            },
+            updated() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'updated', timestamp: Date.now() });
+            },
+            */
+            beforeDestroy() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeDestroy', timestamp: Date.now() });
+            },
+            destroyed() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'destroyed', timestamp: Date.now() });
+            }
         });
     </script>
 </body>
