@@ -12,7 +12,7 @@
         <h1>Trabajo Práctico 1</h1>
         <hr>
 
-        Paso #2
+        <!-- Paso #2 -->
         <h2>Paso #2: Información de Perfil Simple</h2>
         <p>Nombre: {{ nombre }}</p>
         <p>Edad: {{ edad }}</p>
@@ -20,6 +20,7 @@
         <p>Hola, mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{ ciudad }}.</p>
         <hr>
 
+        <!-- Paso #3 -->
         <h2>Paso #3: Contador Interactivo</h2>
         <!-- Muestra el valor actual del contador -->
         <p>Contador: {{ contador }}</p>
@@ -27,28 +28,86 @@
         <button @click="incrementar">Incrementar</button>
         <button @click="decrementar">Decrementar</button>
         <hr>
+
+        <!-- Paso #4 -->
+        <h2>Paso #4: Lista de Tareas</h2>
+        
+        <!-- Input y botón para añadir tareas -->
+        <input type="text" v-model="nuevaTarea" placeholder="Nueva tarea...">
+        <button @click="agregarTarea">Añadir Tarea</button>
+
+        <!-- Propiedades computadas -->
+        <p>Total de Tareas: {{ totalTareas }}</p>
+        <p>Tareas Pendientes: {{ tareasPendientes }}</p>
+
+        <!-- Lista dinámica de tareas -->
+        <ul>
+            <li v-for="tarea in tareas" :key="tarea.id">
+                <input type="checkbox" v-model="tarea.completada">
+                <span :style="tarea.completada ? 'text-decoration: line-through; color: gray;' : ''">
+                    {{ tarea.texto }}
+                </span>
+            </li>
+        </ul>
+        <hr>
     </div>
-            <!-- Librería Vue.js (CDN) -->
+    
+    <!-- Librería Vue.js (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
 
     <script>
         new Vue({
             el: '#app',
             data: {
+                // Variables Paso 2
                 nombre: "Ana García",
                 edad: 30,
                 ciudad: "Tupungato",
                 
-                contador: 0
+                // Variables Paso 3
+                contador: 0,
+
+                // Variables Paso 4
+                nuevaTarea: '',
+                tareas: [
+                    { id: 1, texto: 'Aprender Vue', completada: false }
+                ]
             },
             computed: {
+                // Propiedades computadas Paso 4
+                totalTareas() {
+                    return this.tareas.length;
+                },
+                tareasPendientes() {
+                    return this.tareas.filter(tarea => tarea.completada === false).length;
+                }
             },
             methods: {
+                // Metodos Paso 3
                 incrementar() {
                     this.contador++; //suma 1
                 },
                 decrementar() {
                     this.contador--; //resta 1
+                },
+
+                // Metodos Paso 4
+                agregarTarea() {
+                    // Si el input está vacío, no hace nada
+                    if (this.nuevaTarea.trim() === '') return;
+                    
+                    // Genera un ID dinámico sumando 1 al máximo actual
+                    let nuevoId = this.tareas.length > 0 ? Math.max(...this.tareas.map(t => t.id)) + 1 : 1;
+                    
+                    // Agrega la tarea al arreglo
+                    this.tareas.push({
+                        id: nuevoId,
+                        texto: this.nuevaTarea,
+                        completada: false
+                    });
+                    
+                    // Limpia el input
+                    this.nuevaTarea = '';
                 }
             }
         });
