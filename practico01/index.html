@@ -50,6 +50,15 @@
             </li>
         </ul>
         <hr>
+
+        <!-- Paso #5: Lista de eventos -->
+        <h2>Paso #5: Lista de eventos (Ciclo de Vida)</h2>
+        <ul>
+            <li v-for="evento in listaeventos" :key="evento.id">
+                <strong>{{ evento.nombre }}</strong> - {{ evento.timestamp }}
+            </li>
+        </ul>
+        <hr>
     </div>
     
     <!-- Librería Vue.js (CDN) -->
@@ -71,7 +80,10 @@
                 nuevaTarea: '',
                 tareas: [
                     { id: 1, texto: 'Aprender Vue', completada: false }
-                ]
+                ],
+
+                // Variables Paso 5: Definido literalmente como un conjunto vacío
+                listaeventos: []
             },
             computed: {
                 // Propiedades computadas Paso 4
@@ -93,22 +105,45 @@
 
                 // Metodos Paso 4
                 agregarTarea() {
-                    // Si el input está vacío, no hace nada
                     if (this.nuevaTarea.trim() === '') return;
                     
-                    // Genera un ID dinámico sumando 1 al máximo actual
                     let nuevoId = this.tareas.length > 0 ? Math.max(...this.tareas.map(t => t.id)) + 1 : 1;
                     
-                    // Agrega la tarea al arreglo
                     this.tareas.push({
                         id: nuevoId,
                         texto: this.nuevaTarea,
                         completada: false
                     });
                     
-                    // Limpia el input
                     this.nuevaTarea = '';
                 }
+            },
+
+            // --- HOOKS DEL CICLO DE VIDA (Paso #5) ---
+            beforeCreate() {
+                // 'this.listaeventos' aún no existe en el scope de la instancia en esta fase
+                console.log("beforeCreate disparado");
+            },
+            created() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'created', timestamp: Date.now() });
+            },
+            beforeMount() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeMount', timestamp: Date.now() });
+            },
+            mounted() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'mounted', timestamp: Date.now() });
+            },
+            beforeUpdate() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeUpdate', timestamp: Date.now() });
+            },
+            updated() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'updated', timestamp: Date.now() });
+            },
+            beforeDestroy() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeDestroy', timestamp: Date.now() });
+            },
+            destroyed() {
+                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'destroyed', timestamp: Date.now() });
             }
         });
     </script>
