@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trabajo Práctico #1 - Vue.js</title>
+    <!-- Paso #6: Librería Axios CDN ya incluida -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
@@ -22,25 +23,17 @@
 
         <!-- Paso #3 -->
         <h2>Paso #3: Contador Interactivo</h2>
-        <!-- Muestra el valor actual del contador -->
         <p>Contador: {{ contador }}</p>
-        <!-- Botones con que llaman a los métodos -->
         <button @click="incrementar">Incrementar</button>
         <button @click="decrementar">Decrementar</button>
         <hr>
 
         <!-- Paso #4 -->
         <h2>Paso #4: Lista de Tareas</h2>
-        
-        <!-- Input y botón para añadir tareas -->
         <input type="text" v-model="nuevaTarea" placeholder="Nueva tarea...">
         <button @click="agregarTarea">Añadir Tarea</button>
-
-        <!-- Propiedades computadas -->
         <p>Total de Tareas: {{ totalTareas }}</p>
         <p>Tareas Pendientes: {{ tareasPendientes }}</p>
-
-        <!-- Lista dinámica de tareas -->
         <ul>
             <li v-for="tarea in tareas" :key="tarea.id">
                 <input type="checkbox" v-model="tarea.completada">
@@ -61,90 +54,64 @@
         <hr>
     </div>
     
-    <!-- Librería Vue.js (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
 
     <script>
         new Vue({
             el: '#app',
             data: {
-                // Variables Paso 2
                 nombre: "Ana García",
                 edad: 30,
                 ciudad: "Tupungato",
-                
-                // Variables Paso 3
                 contador: 0,
-
-                // Variables Paso 4
                 nuevaTarea: '',
                 tareas: [
                     { id: 1, texto: 'Aprender Vue', completada: false }
                 ],
-
-                // Variables Paso 5: Definido literalmente como un conjunto vacío
                 listaeventos: []
             },
             computed: {
-                // Propiedades computadas Paso 4
-                totalTareas() {
-                    return this.tareas.length;
-                },
-                tareasPendientes() {
-                    return this.tareas.filter(tarea => tarea.completada === false).length;
-                }
+                totalTareas() { return this.tareas.length; },
+                tareasPendientes() { return this.tareas.filter(tarea => tarea.completada === false).length; }
             },
             methods: {
-                // Metodos Paso 3
-                incrementar() {
-                    this.contador++; //suma 1
-                },
-                decrementar() {
-                    this.contador--; //resta 1
-                },
-
-                // Metodos Paso 4
+                incrementar() { this.contador++; },
+                decrementar() { this.contador--; },
                 agregarTarea() {
                     if (this.nuevaTarea.trim() === '') return;
-                    
                     let nuevoId = this.tareas.length > 0 ? Math.max(...this.tareas.map(t => t.id)) + 1 : 1;
-                    
-                    this.tareas.push({
-                        id: nuevoId,
-                        texto: this.nuevaTarea,
-                        completada: false
-                    });
-                    
+                    this.tareas.push({ id: nuevoId, texto: this.nuevaTarea, completada: false });
                     this.nuevaTarea = '';
+                },
+
+                // --- Métodos Paso #6: Implementación de Axios ---
+                async obtenerPost(postId) {
+                    try {
+                        const respuesta = await axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`);
+                        return respuesta.data;
+                    } catch (error) {
+                        console.error("Error al obtener el post:", error);
+                    }
+                },
+                async obtenerComments(postId) {
+                    try {
+                        const respuesta = await axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}/comments`);
+                        return respuesta.data;
+                    } catch (error) {
+                        console.error("Error al obtener los comentarios:", error);
+                    }
                 }
             },
 
-            // --- HOOKS DEL CICLO DE VIDA (Paso #5) ---
-            beforeCreate() {
-                // 'this.listaeventos' aún no existe en el scope de la instancia en esta fase
-                console.log("beforeCreate disparado");
-            },
-            created() {
-                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'created', timestamp: Date.now() });
-            },
-            beforeMount() {
-                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeMount', timestamp: Date.now() });
-            },
-            mounted() {
-                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'mounted', timestamp: Date.now() });
-            },
-            beforeUpdate() {
-                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeUpdate', timestamp: Date.now() });
-            },
-            updated() {
-                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'updated', timestamp: Date.now() });
-            },
-            beforeDestroy() {
-                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeDestroy', timestamp: Date.now() });
-            },
-            destroyed() {
-                this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'destroyed', timestamp: Date.now() });
-            }
+            // --- HOOKS DEL CICLO DE VIDA (Paso #5 Literal) ---
+            beforeCreate() { console.log("beforeCreate disparado"); },
+            created() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'created', timestamp: Date.now() }); },
+            beforeMount() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeMount', timestamp: Date.now() }); },
+            mounted() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'mounted', timestamp: Date.now() }); },
+            beforeUpdate() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeUpdate', timestamp: Date.now() }); },
+            updated() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'updated', timestamp: Date.now() }); },
+            beforeDestroy() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'beforeDestroy', timestamp: Date.now() }); },
+            destroyed() { this.listaeventos.push({ id: this.listaeventos.length + 1, nombre: 'destroyed', timestamp: Date.now() }); }
         });
     </script>
 </body>
